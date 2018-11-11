@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { registerUser } from '../../actions/authActions';
 
-export default class Register extends Component {
+class Register extends Component {
   constructor() {
     super();
     this.state = {
@@ -29,19 +32,24 @@ export default class Register extends Component {
       password: this.state.password
     };
 
-    axios.post('/auth/register', newUser)
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-      });
+    this.props.registerUser(newUser);
+
+    // axios.post('/auth/register', newUser)
+    //   .then((res) => {
+    //     console.log(res.data);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err.response.data);
+    //   });
   }
 
   render() {
+    const { user } = this.props.auth;
+
     return (
       <div>
         <h1>Register</h1>
+        {user ? user.name : null}
         <div style={{width: 90}}>
           <form onSubmit={this.onSubmit}>
             <input type="text" name="name" placeholder="Name" required value={this.state.name} onChange={this.onChange} />
@@ -55,3 +63,14 @@ export default class Register extends Component {
     )
   }
 }
+
+Register.propTypes = {
+  registerUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired
+}
+
+const mapStateToProps = (state) => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps, { registerUser })(Register);
